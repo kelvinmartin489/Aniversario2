@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#24131f">
+  <meta name="description" content="Un pequeño rincón para guardar nuestra historia, nuestros recuerdos y todos los lugares que significan algo para nosotros.">
+  <title>Nuestra historia — Un lugar para nosotros</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="data/memories.js"></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
+
+  <!-- ── Pantalla de cuenta regresiva ── -->
+  <div class="lock-screen" id="countdownScreen" aria-modal="true" role="dialog" aria-label="Cuenta regresiva">
+    <div class="lock-card">
+      <span class="lock-icon" aria-hidden="true">♥</span>
+      <h1 class="lock-title">Algo especial se acerca</h1>
+      <p class="lock-subtitle">Falta muy poco para un día que nunca voy a olvidar</p>
+      <div class="countdown-grid" aria-live="polite" aria-atomic="true">
+        <div class="countdown-item">
+          <span class="countdown-num" id="cdDays">00</span>
+          <span class="countdown-label">días</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-item">
+          <span class="countdown-num" id="cdHours">00</span>
+          <span class="countdown-label">horas</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-item">
+          <span class="countdown-num" id="cdMinutes">00</span>
+          <span class="countdown-label">minutos</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-item">
+          <span class="countdown-num" id="cdSeconds">00</span>
+          <span class="countdown-label">segundos</span>
+        </div>
+      </div>
+      <p class="countdown-date-label">10 · 11 · 2026</p>
+    </div>
+  </div>
+
+  <!-- ── Pantalla de bloqueo ── -->
+  <div class="lock-screen" id="lockScreen" aria-modal="true" role="dialog" aria-label="Acceso protegido" hidden>
+    <div class="lock-card">
+      <span class="lock-icon" aria-hidden="true">♥</span>
+      <h1 class="lock-title">Solo para ti</h1>
+      <p class="lock-subtitle">Ingresa nuestra fecha especial para entrar</p>
+      <p class="lock-hint">Formato: <strong>DD/MM</strong></p>
+      <form class="lock-form" id="lockForm" novalidate>
+        <input
+          class="lock-input"
+          id="lockInput"
+          type="text"
+          inputmode="numeric"
+          maxlength="5"
+          placeholder="DD/MM"
+          autocomplete="off"
+          aria-label="Fecha de aniversario"
+          aria-describedby="lockError"
+        >
+        <button class="lock-btn" type="submit">Entrar <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="lock-error" id="lockError" aria-live="polite" hidden>Fecha incorrecta. Inténtalo de nuevo ♥</p>
+    </div>
+  </div>
+
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Ir al inicio">
+      <span class="brand-mark" aria-hidden="true">♥</span>
+      <span>Nuestra historia</span>
+    </a>
+    <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mainNav"><span></span><span></span></button>
+    <nav class="main-nav" id="mainNav" aria-label="Navegación principal">
+      <a href="#fotos">Fotos</a>
+      <a href="#album">Álbum</a>
+      <a href="#momentos">Momentos</a>
+      <a href="#mapa">Nuestro mapa</a>
+      <a class="nav-special" href="#carta">La carta <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main id="contenido">
+    <section class="hero section-shell" id="inicio">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> Un rincón hecho para nosotros</p>
+        <h1>La historia más bonita es <em>la nuestra.</em></h1>
+        <p class="hero-lede">Una colección de pequeñas cosas que, juntas, significan el mundo para mí.</p>
+        <div class="hero-actions">
+          <a class="button button-light" href="#fotos">Volver a nuestros recuerdos <span aria-hidden="true">↓</span></a>
+          <span class="hero-note"><span class="tiny-heart">♥</span> Hecho con amor, para ti</span>
+        </div>
+        <div class="hero-counter" aria-live="polite">
+          <span class="counter-number" id="daysTogether">∞</span>
+          <span class="counter-caption" id="counterCaption">y muchos recuerdos por crear</span>
+        </div>
+      </div>
+      <div class="hero-visual" aria-label="Imagen decorativa de pareja">
+        <div class="hero-image-frame">
+          <img id="heroImage" src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1200&q=85" alt="Pareja compartiendo un momento especial" fetchpriority="high">
+          <div class="image-stamp"><span>para</span><strong>siempre</strong><span>y un poquito más</span></div>
+        </div>
+        <span class="hero-spark spark-one" aria-hidden="true">✳</span><span class="hero-spark spark-two" aria-hidden="true">✦</span>
+        <div class="hero-caption"><span class="caption-dot"></span><span>Mi lugar favorito siempre será a tu lado.</span></div>
+      </div>
+      <a class="scroll-cue" href="#fotos" aria-label="Desplazarse a las fotos"><span></span> DESLIZA PARA DESCUBRIR</a>
+    </section>
+
+    <section class="intro-strip" aria-label="Dedicatoria">
+      <p>Hay recuerdos que guardamos en fotos, y otros que se quedan <em>para siempre en el corazón.</em></p>
+      <span class="strip-flower" aria-hidden="true">✳</span>
+    </section>
+
+    <section class="content-section section-shell" id="fotos">
+      <div class="section-heading">
+        <div><p class="eyebrow">01 — Instantes</p><h2>Un poquito de <em>nosotros</em></h2></div>
+        <p class="section-description">Pequeños fragmentos de días que quisiera poder volver a vivir una y otra vez.</p>
+      </div>
+      <div class="photo-grid" id="photoGrid" aria-live="polite"></div>
+      <p class="micro-note">Las fotos son de muestra. Cámbialas por las tuyas en <code>data/memories.js</code>.</p>
+    </section>
+
+    <section class="album-section" id="album">
+      <div class="section-shell">
+        <div class="section-heading section-heading-light">
+          <div><p class="eyebrow">02 — Nuestro álbum</p><h2>Capítulos de una <em>misma historia</em></h2></div>
+          <p class="section-description">No importa si fue una gran aventura o una tarde cualquiera. Si fue contigo, merece estar aquí.</p>
+        </div>
+        <div class="album-toolbar"><p>Abre una página al azar, encuentra un recuerdo y quédate un rato.</p><div class="filter-list" id="albumFilters" aria-label="Filtrar recuerdos"></div></div>
+        <div class="album-grid" id="albumGrid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="content-section section-shell timeline-section" id="momentos">
+      <div class="section-heading">
+        <div><p class="eyebrow">03 — Momentos inolvidables</p><h2>Fechas que viven <em>en mí</em></h2></div>
+        <p class="section-description">Nuestra historia no se mide solo en años, sino en todos esos instantes que nos trajeron hasta aquí.</p>
+      </div>
+      <div class="timeline" id="timeline" aria-live="polite"></div>
+    </section>
+
+    <section class="map-section" id="mapa">
+      <div class="section-shell">
+        <div class="section-heading">
+          <div><p class="eyebrow">04 — Geografía del corazón</p><h2>Los lugares que <em>nos pertenecen</em></h2></div>
+          <p class="section-description">Hay lugares que se vuelven especiales por lo que pasó allí. Estos son algunos de los nuestros.</p>
+        </div>
+        <div class="map-layout">
+          <div class="map-card"><div id="memoryMap" role="application" aria-label="Mapa interactivo de nuestros lugares"></div><div class="map-credit">Mapa © OpenStreetMap · Visualizado con Leaflet</div></div>
+          <aside class="places-panel">
+            <div class="places-panel-head"><span class="pin-icon" aria-hidden="true">⌖</span><div><h3>Nuestros lugares</h3><p id="placeCount">Recuerdos con dirección</p></div></div>
+            <div class="places-list" id="placesList"></div>
+            <p class="map-instruction">Edita los nombres, direcciones y coordenadas en <code>data/memories.js</code>. Al seleccionar un lugar, el mapa se centrará en él.</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="letter-section section-shell" id="carta">
+      <div class="letter-decoration" aria-hidden="true">✳</div>
+      <p class="eyebrow">05 — Algo que quiero decirte</p>
+      <h2>Unas palabras <em>para ti</em></h2>
+      <p class="letter-teaser">Hay cosas que a veces no digo lo suficiente. Por eso guardé unas cuantas aquí, solo para ti.</p>
+      <button class="button button-dark" id="openLetter" type="button" aria-expanded="false" aria-controls="letterContent">Abrir mi carta <span aria-hidden="true">♥</span></button>
+      <article class="letter-content" id="letterContent" hidden>
+        <p class="letter-salutation" id="letterSalutation">Mi amor,</p>
+        <div id="letterBody"></div>
+        <p class="letter-signoff" id="letterSignoff">Con todo mi amor, siempre.</p>
+      </article>
+    </section>
+
+    <section class="dreams-section">
+      <div class="section-shell dreams-inner"><div><p class="eyebrow">06 — Lo que nos espera</p><h2>Lo mejor todavía <em>está por venir.</em></h2></div><p id="dreamsText">Más lugares que descubrir, más fotos que tomar, más historias que contar. Y ojalá, siempre, juntos.</p><a href="#inicio" class="text-link">Volver al principio <span aria-hidden="true">↑</span></a></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a class="footer-heart" href="#inicio" aria-label="Volver arriba">♥</a><p>Creado con cariño, para guardar nuestra historia.</p><span id="footerNames">Tú + yo · siempre</span></footer>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Fotografía ampliada">
+    <button class="lightbox-close" id="closeLightbox" type="button" aria-label="Cerrar fotografía">×</button>
+    <button class="lightbox-arrow lightbox-prev" id="prevPhoto" type="button" aria-label="Fotografía anterior">‹</button>
+    <figure><img id="lightboxImage" src="" alt=""><figcaption><span id="lightboxTitle"></span><small id="lightboxCaption"></small></figcaption></figure>
+    <button class="lightbox-arrow lightbox-next" id="nextPhoto" type="button" aria-label="Fotografía siguiente">›</button>
+  </dialog>
+</body>
+</html>
